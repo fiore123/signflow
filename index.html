@@ -21,7 +21,6 @@
     <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <!-- Removed downloadjs dependency as we are using native download -->
 
     <script>
         tailwind.config = {
@@ -718,24 +717,17 @@
         }
 
         function downloadFinalPdf() {
-            if (finalPdfBlobUrl) {
-                const link = document.createElement('a');
-                link.href = finalPdfBlobUrl;
-                link.download = `Documento_Assinado_${Date.now()}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else if (finalPdfData) {
-                const blob = new Blob([finalPdfData], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `Documento_Assinado_${Date.now()}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }
+            if (!finalPdfData) return;
+            // Force browser to treat it as a generic binary file, not a PDF to be viewed
+            const blob = new Blob([finalPdfData], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Documento_Assinado_${Date.now()}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         function closeSuccessModal() {

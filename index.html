@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SignFlow Ultimate 2026</title>
+    <title>SignFlow Ultimate (Stable)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,6 @@
                     },
                     colors: {
                         zinc: { 850: '#1f1f22', 950: '#09090b' },
-                        indigo: { 550: '#4f46e5' } // Custom Indigo
                     },
                     animation: {
                         'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -57,14 +56,14 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Smooth Rendering */
+        /* Rendering Canvas */
         #the-canvas {
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
             border-radius: 4px; 
             max-width: 100%; height: auto !important;
         }
 
-        /* Draggable Items */
+        /* Drag Items */
         .drag-item {
             position: absolute; cursor: grab; touch-action: none; user-select: none;
             border: 1px dashed transparent; transition: border-color 0.2s, background-color 0.2s;
@@ -73,9 +72,9 @@
             border-color: #6366f1; background-color: rgba(99, 102, 241, 0.1); z-index: 50;
         }
         .drag-item.is-dragging { cursor: grabbing; scale: 1.02; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .drag-item img, .drag-item .date-text { pointer-events: none; display: block; width: 100%; height: 100%; }
+        .drag-item img { pointer-events: none; display: block; width: 100%; height: 100%; }
 
-        /* Controls (Delete/Resize) */
+        /* Controls */
         .control-btn {
             position: absolute; width: 28px; height: 28px; background: white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -87,17 +86,6 @@
         .delete-btn { top: -14px; right: -14px; background: #ef4444; color: white; }
         .resize-handle { bottom: -12px; right: -12px; border: 2px solid #6366f1; cursor: nwse-resize; }
         .resize-handle::after { content: ''; width: 8px; height: 8px; background: #6366f1; border-radius: 50%; }
-
-        /* Typography for Date */
-        .date-text {
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Inter', sans-serif; font-weight: 500; white-space: nowrap;
-        }
-
-        /* Custom Scrollbar */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
 
         /* Loader */
         .loader {
@@ -184,19 +172,16 @@
     <div id="modal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center animate-fade-in p-0 sm:p-4">
         <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col h-[90vh] sm:h-auto overflow-hidden animate-slide-up">
             
-            <!-- Header -->
             <div class="flex justify-between items-center p-4 border-b border-zinc-800 bg-zinc-900/95">
                 <h3 class="font-semibold text-white pl-2">Criar Assinatura</h3>
                 <button onclick="closeModal()" class="w-8 h-8 rounded-full hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
 
-            <!-- Tabs -->
             <div class="flex p-1.5 mx-4 mt-4 bg-zinc-950 rounded-xl border border-zinc-800">
                 <button onclick="setTab('draw')" id="tab-draw" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all bg-zinc-800 text-white shadow-sm">Desenhar</button>
                 <button onclick="setTab('type')" id="tab-type" class="flex-1 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-all">Digitar</button>
             </div>
 
-            <!-- Colors -->
             <div class="px-6 py-4 flex items-center justify-center gap-6">
                 <div class="flex items-center gap-2 cursor-pointer group" onclick="setInkColor('black')">
                     <div class="w-6 h-6 rounded-full bg-zinc-950 border-2 border-zinc-600 shadow-sm relative group-hover:scale-110 transition-transform">
@@ -212,13 +197,9 @@
                 </div>
             </div>
 
-            <!-- Content Area -->
             <div class="flex-1 px-4 pb-0 bg-zinc-900 flex flex-col relative">
-                
-                <!-- Draw View -->
                 <div id="view-draw" class="flex-1 flex flex-col">
                     <div class="flex-1 border border-zinc-700 bg-[#18181b] rounded-xl relative overflow-hidden shadow-inner min-h-[180px]">
-                        <!-- Paper Texture -->
                         <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: linear-gradient(#fff 1px, transparent 1px); background-size: 100% 32px;"></div>
                         <canvas id="pad" class="w-full h-full cursor-crosshair touch-none"></canvas>
                         <span class="absolute bottom-3 right-3 text-[10px] text-zinc-600 pointer-events-none font-medium uppercase tracking-wider">Assine Acima</span>
@@ -233,7 +214,6 @@
                     </div>
                 </div>
 
-                <!-- Type View -->
                 <div id="view-type" class="hidden flex-1 flex flex-col items-center justify-center min-h-[180px] bg-zinc-950/50 rounded-xl border border-zinc-800">
                     <input type="text" id="type-input" placeholder="Digite seu nome" 
                         class="w-full bg-transparent text-center text-4xl text-white font-cursive focus:outline-none placeholder-zinc-700 px-4 py-2" 
@@ -241,10 +221,8 @@
                     <div class="w-1/2 h-px bg-zinc-800 mt-2"></div>
                     <p class="text-xs text-zinc-500 mt-4">Será gerado com estilo cursivo</p>
                 </div>
-
             </div>
 
-            <!-- Footer -->
             <div class="p-4 pt-4 bg-zinc-900 border-t border-zinc-800 mt-2">
                 <button onclick="addSignature()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 text-sm">
                     <i data-lucide="check" class="w-4 h-4"></i> Confirmar Assinatura
@@ -253,34 +231,29 @@
         </div>
     </div>
 
-    <!-- JS Logic -->
     <script>
         // --- Init ---
         lucide.createIcons();
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // --- State ---
         let pdfDoc = null;
         let pdfBytes = null;
         let pageNum = 1;
         let items = [];
         let inkColor = 'black'; 
-        let activeMode = 'draw'; // 'draw' | 'type'
+        let activeMode = 'draw'; 
 
-        // --- Constants ---
         const COLORS = {
             black: { hex: '#000000', label: 'Preto' },
-            blue: { hex: '#0033cc', label: 'Azul' } // Standard Pen Blue
+            blue: { hex: '#0033cc', label: 'Azul' }
         };
 
-        // --- DOM Elements ---
         const canvas = document.getElementById('the-canvas');
         const ctx = canvas.getContext('2d');
         const layer = document.getElementById('layer-container');
         const pad = document.getElementById('pad');
         const padCtx = pad.getContext('2d');
 
-        // --- PDF Loading ---
         document.getElementById('file-upload').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -292,7 +265,6 @@
                     const loadingTask = pdfjsLib.getDocument(pdfBytes);
                     pdfDoc = await loadingTask.promise;
                     
-                    // Unlock UI
                     document.getElementById('empty-state').classList.add('hidden');
                     const wrapper = document.getElementById('pdf-wrapper');
                     wrapper.classList.remove('hidden');
@@ -313,7 +285,6 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // --- Rendering ---
         async function renderPage(num) {
             if (!pdfDoc) return;
             const page = await pdfDoc.getPage(num);
@@ -351,11 +322,10 @@
             }
         }
 
-        // --- Modal Logic ---
         function openModal() {
             document.getElementById('modal').classList.remove('hidden');
             resizePad();
-            setTab('draw'); // Default to draw
+            setTab('draw'); 
             setInkColor(inkColor);
             if(localStorage.getItem('signflow_last')) {
                 document.getElementById('btn-restore').classList.remove('hidden');
@@ -385,7 +355,7 @@
                 viewDraw.classList.add('hidden');
                 document.getElementById('type-input').focus();
             }
-            updateTypePreview(); // Refresh color on input if switching
+            updateTypePreview();
         }
 
         function setInkColor(c) {
@@ -397,10 +367,9 @@
 
         function updateTypePreview() {
             const input = document.getElementById('type-input');
-            input.style.color = (inkColor === 'blue') ? '#60a5fa' : '#ffffff'; // Visual preview color
+            input.style.color = (inkColor === 'blue') ? '#60a5fa' : '#ffffff'; 
         }
 
-        // --- Drawing Logic (Perfect Pen) ---
         let points = [];
         let isDrawing = false;
 
@@ -457,12 +426,10 @@
             points = [];
         }));
 
-        // --- Generating Signature ---
         function addSignature() {
             let dataUrl;
 
             if (activeMode === 'draw') {
-                // Convert Drawn Path to Colored Image
                 const tCanvas = document.createElement('canvas');
                 tCanvas.width = pad.width;
                 tCanvas.height = pad.height;
@@ -474,24 +441,22 @@
                 tCtx.fillRect(0, 0, tCanvas.width, tCanvas.height);
                 dataUrl = tCanvas.toDataURL();
                 
-                // Save
                 localStorage.setItem('signflow_last', dataUrl);
 
             } else {
-                // Generate from Text
                 const text = document.getElementById('type-input').value.trim();
                 if (!text) return alert("Digite seu nome.");
 
                 const tCanvas = document.createElement('canvas');
-                tCanvas.width = 800;
-                tCanvas.height = 250;
+                tCanvas.width = 1000;
+                tCanvas.height = 300;
                 const tCtx = tCanvas.getContext('2d');
 
-                tCtx.font = "italic 100px 'Great Vibes'";
+                tCtx.font = "italic 120px 'Great Vibes'";
                 tCtx.fillStyle = COLORS[inkColor].hex;
                 tCtx.textAlign = "center";
                 tCtx.textBaseline = "middle";
-                tCtx.fillText(text, 400, 125);
+                tCtx.fillText(text, 500, 150);
                 
                 dataUrl = tCanvas.toDataURL();
             }
@@ -511,13 +476,25 @@
 
         function addDateStamp() {
             const d = new Date().toLocaleDateString('pt-BR');
-            placeItem({ type: 'text', data: d, w: 120 });
+            // FIX: Convert Data to Image to avoid Font Embedding Errors
+            const tCanvas = document.createElement('canvas');
+            tCanvas.width = 400;
+            tCanvas.height = 100;
+            const tCtx = tCanvas.getContext('2d');
+            
+            tCtx.font = "500 60px 'Inter'"; // Matches UI
+            tCtx.fillStyle = "#000000";
+            tCtx.textAlign = "center";
+            tCtx.textBaseline = "middle";
+            tCtx.fillText(d, 200, 50);
+
+            placeItem({ type: 'img', data: tCanvas.toDataURL(), w: 120 });
         }
 
         function placeItem(obj) {
             items.push({
                 id: Date.now(),
-                type: obj.type,
+                type: 'img', // Force all to img
                 page: pageNum,
                 x: 40, y: 45,
                 w: obj.w,
@@ -526,7 +503,6 @@
             renderItems();
         }
 
-        // --- Item Interaction ---
         function renderItems() {
             layer.innerHTML = '';
             items.forEach(item => {
@@ -538,8 +514,7 @@
                 el.style.top = item.y + '%';
                 el.style.width = item.w + 'px';
 
-                if(item.type === 'img') el.innerHTML = `<img src="${item.data}">`;
-                else el.innerHTML = `<div class="date-text" style="font-size:${item.w/5.5}px; color: ${COLORS.black.hex}">${item.data}</div>`;
+                el.innerHTML = `<img src="${item.data}">`;
 
                 el.innerHTML += `
                     <div class="control-btn delete-btn" id="del-${item.id}"><i data-lucide="x" class="w-4 h-4"></i></div>
@@ -591,7 +566,6 @@
                 } else {
                     let nw = Math.max(40, Math.min(initial.w + dx, p.width - initial.l));
                     el.style.width = nw + 'px';
-                    if(item.type === 'text') el.querySelector('.date-text').style.fontSize = (nw/5.5)+'px';
                 }
             };
 
@@ -614,7 +588,6 @@
             el.addEventListener('pointerup', onUp);
         }
 
-        // --- Save PDF ---
         async function savePdf() {
             if (items.length === 0) return alert("Documento sem alterações.");
             
@@ -624,7 +597,7 @@
 
             try {
                 const pdfDocLib = await PDFLib.PDFDocument.load(pdfBytes);
-                const font = await pdfDocLib.embedFont(PDFLib.StandardFonts.HelveticaBold);
+                // No font embedding needed anymore!
                 const pages = pdfDocLib.getPages();
 
                 for(const item of items) {
@@ -635,17 +608,11 @@
                     const pdfW = item.w * scaleFactor;
                     const pdfX = (item.x / 100) * width;
                     
-                    if(item.type === 'img') {
-                        const img = await pdfDocLib.embedPng(item.data);
-                        const pdfH = (img.height/img.width) * pdfW;
-                        const pdfY = height - ((item.y/100)*height) - pdfH;
-                        page.drawImage(img, { x: pdfX, y: pdfY, width: pdfW, height: pdfH });
-                    } else {
-                        const fontSize = pdfW / 5.5;
-                        const pdfH = fontSize;
-                        const pdfY = height - ((item.y/100)*height) - pdfH + (fontSize*0.15);
-                        page.drawText(item.data, { x: pdfX, y: pdfY, size: fontSize, font: font, color: PDFLib.rgb(0,0,0) });
-                    }
+                    // Everything is IMG now
+                    const img = await pdfDocLib.embedPng(item.data);
+                    const pdfH = (img.height/img.width) * pdfW;
+                    const pdfY = height - ((item.y/100)*height) - pdfH;
+                    page.drawImage(img, { x: pdfX, y: pdfY, width: pdfW, height: pdfH });
                 }
 
                 const pdfData = await pdfDocLib.save();
@@ -653,7 +620,7 @@
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#ffffff'] });
 
             } catch(e) {
-                alert("Erro ao salvar.");
+                alert("Erro ao salvar: " + e.message);
                 console.error(e);
             } finally {
                 btn.innerHTML = originalHTML;

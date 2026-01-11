@@ -252,7 +252,7 @@
                     <i data-lucide="check" class="w-8 h-8 text-green-400"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-white mb-1">Documento Pronto!</h2>
-                <p class="text-zinc-400 text-sm">Escolha como deseja salvar seu documento.</p>
+                <p class="text-zinc-400 text-sm">Seu PDF foi assinado e compilado com sucesso.</p>
             </div>
 
             <!-- Preview Area -->
@@ -716,34 +716,30 @@
             if(finalPdfBlobUrl) window.open(finalPdfBlobUrl, '_blank');
         }
 
-        // UPDATED DOWNLOAD LOGIC FOR iOS
         async function downloadFinalPdf() {
             if (!finalPdfData) return;
             
-            // Check for Mobile / Web Share API support
-            // This is the cleanest way on iOS to "Save to Files"
             const blob = new Blob([finalPdfData], { type: 'application/pdf' });
-            const file = new File([blob], `Documento_Assinado_${Date.now()}.pdf`, { type: 'application/pdf' });
+            const fileName = `Documento_Assinado_${Date.now()}.pdf`;
+            const file = new File([blob], fileName, { type: 'application/pdf' });
 
+            // iOS Safari Share API Logic
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
-                        files: [file],
-                        title: 'Documento Assinado',
-                        text: 'Seu documento assinado via SignFlow.'
+                        files: [file]
                     });
-                    return; // Success, stop here
+                    return; 
                 } catch (error) {
-                    // User cancelled share or error, fallback to normal download
-                    console.log('Share failed/cancelled, falling back to anchor', error);
+                    console.log('Share canceled/failed', error);
                 }
             }
 
-            // Fallback for Desktop or if Share fails
+            // Fallback
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Documento_Assinado_${Date.now()}.pdf`;
+            link.download = fileName;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

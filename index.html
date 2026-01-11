@@ -237,7 +237,7 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         let pdfDoc = null;
-        let pdfBytes = null;
+        let pdfBytes = null; // Contains the SAVE-SAFE copy
         let pageNum = 1;
         let items = [];
         let inkColor = 'black'; 
@@ -260,9 +260,15 @@
 
             const reader = new FileReader();
             reader.onload = async (ev) => {
-                pdfBytes = new Uint8Array(ev.target.result);
+                const buffer = ev.target.result;
+                
+                // CRITICAL FIX: Clone buffer for saving.
+                // PDF.js worker often transfers/detaches the buffer, leaving the original empty.
+                pdfBytes = new Uint8Array(buffer.slice(0)); 
+
                 try {
-                    const loadingTask = pdfjsLib.getDocument(pdfBytes);
+                    // Pass a NEW copy or valid view to PDF.js
+                    const loadingTask = pdfjsLib.getDocument(new Uint8Array(buffer));
                     pdfDoc = await loadingTask.promise;
                     
                     document.getElementById('empty-state').classList.add('hidden');
@@ -279,7 +285,7 @@
                     items = [];
                     renderPage(pageNum);
                 } catch(err) {
-                    alert("Erro ao abrir PDF.");
+                    alert("Erro ao abrir PDF: " + err.message);
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -476,13 +482,12 @@
 
         function addDateStamp() {
             const d = new Date().toLocaleDateString('pt-BR');
-            // FIX: Convert Data to Image to avoid Font Embedding Errors
             const tCanvas = document.createElement('canvas');
             tCanvas.width = 400;
             tCanvas.height = 100;
             const tCtx = tCanvas.getContext('2d');
             
-            tCtx.font = "500 60px 'Inter'"; // Matches UI
+            tCtx.font = "500 60px 'Inter'"; 
             tCtx.fillStyle = "#000000";
             tCtx.textAlign = "center";
             tCtx.textBaseline = "middle";
@@ -494,7 +499,7 @@
         function placeItem(obj) {
             items.push({
                 id: Date.now(),
-                type: 'img', // Force all to img
+                type: 'img',
                 page: pageNum,
                 x: 40, y: 45,
                 w: obj.w,
@@ -591,13 +596,18 @@
         async function savePdf() {
             if (items.length === 0) return alert("Documento sem alterações.");
             
+            // Safety Check
+            if(!pdfBytes || pdfBytes.length === 0) {
+                 return alert("Erro Interno: O arquivo PDF original foi perdido da memória. Por favor, recarregue a página e tente novamente.");
+            }
+
             const btn = document.getElementById('save-btn');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<div class="loader"></div>';
 
             try {
+                // Now load the SAFE COPY
                 const pdfDocLib = await PDFLib.PDFDocument.load(pdfBytes);
-                // No font embedding needed anymore!
                 const pages = pdfDocLib.getPages();
 
                 for(const item of items) {
@@ -608,7 +618,6 @@
                     const pdfW = item.w * scaleFactor;
                     const pdfX = (item.x / 100) * width;
                     
-                    // Everything is IMG now
                     const img = await pdfDocLib.embedPng(item.data);
                     const pdfH = (img.height/img.width) * pdfW;
                     const pdfY = height - ((item.y/100)*height) - pdfH;
@@ -629,4 +638,5 @@
     </script>
 </body>
 </html>
+
 

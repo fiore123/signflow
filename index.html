@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SignFlow Ultimate (Stable)</title>
+    <title>SignFlow Ultimate (Production)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -312,6 +312,7 @@
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 const buffer = ev.target.result;
+                // Clone buffer explicitly to avoid detaching issues
                 pdfBytes = new Uint8Array(buffer.slice(0)); 
 
                 try {
@@ -718,8 +719,7 @@
 
         function downloadFinalPdf() {
             if (!finalPdfData) return;
-            // Force browser to treat it as a generic binary file, not a PDF to be viewed
-            const blob = new Blob([finalPdfData], { type: 'application/octet-stream' });
+            const blob = new Blob([finalPdfData], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;

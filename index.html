@@ -57,20 +57,20 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Rendering Canvas */
+        /* Canvas */
         canvas {
             border-radius: 4px; 
             max-width: 100%; height: auto !important;
         }
         #the-canvas { box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6); }
         
-        /* Preview Canvas inside Success Modal */
+        /* Preview */
         #preview-canvas {
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
             border: 1px solid #27272a;
         }
 
-        /* Drag Items */
+        /* Drag Elements */
         .drag-item {
             position: absolute; cursor: grab; touch-action: none; user-select: none;
             border: 1px dashed transparent; transition: border-color 0.2s, background-color 0.2s;
@@ -89,7 +89,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.25); z-index: 60; transform: scale(0.8);
         }
         .drag-item:hover .control-btn, .drag-item.is-active .control-btn { opacity: 1; transform: scale(1); }
-        
         .delete-btn { top: -14px; right: -14px; background: #ef4444; color: white; }
         .resize-handle { bottom: -12px; right: -12px; border: 2px solid #6366f1; cursor: nwse-resize; }
         .resize-handle::after { content: ''; width: 8px; height: 8px; background: #6366f1; border-radius: 50%; }
@@ -101,7 +100,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Custom Scrollbar */
+        /* Scroll */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
@@ -120,28 +119,20 @@
 
         <div class="flex gap-2 sm:gap-3">
             <input type="file" id="file-upload" accept="application/pdf" class="hidden">
-            
             <button onclick="document.getElementById('file-upload').click()" class="h-10 px-4 rounded-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-all flex items-center gap-2 text-sm font-medium text-zinc-300 hover:text-white">
-                <i data-lucide="folder-open" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">Abrir</span>
+                <i data-lucide="folder-open" class="w-4 h-4"></i><span class="hidden sm:inline">Abrir</span>
             </button>
-
-            <!-- Action Group -->
             <div class="h-10 bg-zinc-800 rounded-full p-1 flex items-center border border-zinc-700">
                 <button id="btn-add-sig" disabled onclick="openModal()" class="h-full px-4 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all flex items-center gap-2 text-sm disabled:opacity-30">
-                    <i data-lucide="pen-tool" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Assinar</span>
+                    <i data-lucide="pen-tool" class="w-4 h-4"></i><span class="hidden sm:inline">Assinar</span>
                 </button>
                 <div class="w-px h-4 bg-zinc-700 mx-1"></div>
                 <button id="btn-add-date" disabled onclick="addDateStamp()" class="h-full px-4 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all flex items-center gap-2 text-sm disabled:opacity-30">
-                    <i data-lucide="calendar" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Data</span>
+                    <i data-lucide="calendar" class="w-4 h-4"></i><span class="hidden sm:inline">Data</span>
                 </button>
             </div>
-
             <button id="save-btn" disabled onclick="processPdf()" class="h-10 px-5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2 text-sm font-medium disabled:opacity-50 disabled:shadow-none">
-                <span class="hidden sm:inline">Finalizar</span>
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Finalizar</span><i data-lucide="arrow-right" class="w-4 h-4"></i>
             </button>
         </div>
     </header>
@@ -149,8 +140,6 @@
     <!-- Workspace -->
     <main class="flex-1 relative overflow-hidden bg-zinc-950 flex flex-col">
         <div id="scroll-container" class="flex-1 overflow-auto flex justify-center p-4 sm:p-8 relative custom-scroll">
-            
-            <!-- Empty State -->
             <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-zinc-500">
                 <div onclick="document.getElementById('file-upload').click()" class="cursor-pointer group relative">
                     <div class="absolute inset-0 bg-indigo-500 blur-[50px] opacity-10 group-hover:opacity-20 transition-opacity rounded-full"></div>
@@ -161,15 +150,11 @@
                 <h2 class="text-xl font-medium text-zinc-200">Arraste seu PDF aqui</h2>
                 <p class="text-sm mt-2 text-zinc-600">Assinatura digital segura e local.</p>
             </div>
-
-            <!-- PDF Layer -->
             <div id="pdf-wrapper" class="relative hidden shadow-2xl self-start mt-2 mb-24 bg-white transition-opacity duration-500 opacity-0">
                 <canvas id="the-canvas" class="block"></canvas>
                 <div id="layer-container" class="absolute inset-0 overflow-hidden"></div>
             </div>
         </div>
-
-        <!-- Floating Pagination -->
         <div id="controls" class="hidden absolute bottom-8 left-1/2 -translate-x-1/2 bg-zinc-900/90 backdrop-blur-md border border-zinc-700/50 rounded-full pl-2 pr-4 py-1.5 flex items-center gap-3 shadow-2xl z-40">
             <div class="flex gap-1">
                 <button onclick="changePage(-1)" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
@@ -180,35 +165,29 @@
         </div>
     </main>
 
-    <!-- Signature Modal -->
+    <!-- Modal Assinatura -->
     <div id="modal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center animate-fade-in p-0 sm:p-4">
         <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col h-[90vh] sm:h-auto overflow-hidden animate-slide-up">
-            
             <div class="flex justify-between items-center p-4 border-b border-zinc-800 bg-zinc-900/95">
                 <h3 class="font-semibold text-white pl-2">Criar Assinatura</h3>
                 <button onclick="closeModal()" class="w-8 h-8 rounded-full hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-
             <div class="flex p-1.5 mx-4 mt-4 bg-zinc-950 rounded-xl border border-zinc-800">
                 <button onclick="setTab('draw')" id="tab-draw" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all bg-zinc-800 text-white shadow-sm">Desenhar</button>
                 <button onclick="setTab('type')" id="tab-type" class="flex-1 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-all">Digitar</button>
             </div>
-
             <div class="px-6 py-4 flex items-center justify-center gap-6">
                 <div class="flex items-center gap-2 cursor-pointer group" onclick="setInkColor('black')">
                     <div class="w-6 h-6 rounded-full bg-zinc-950 border-2 border-zinc-600 shadow-sm relative group-hover:scale-110 transition-transform">
                         <div class="absolute inset-0 rounded-full border-2 border-white opacity-0 transition-opacity" id="ring-black"></div>
-                    </div>
-                    <span class="text-xs text-zinc-400 group-hover:text-white transition-colors">Preto</span>
+                    </div><span class="text-xs text-zinc-400 group-hover:text-white transition-colors">Preto</span>
                 </div>
                 <div class="flex items-center gap-2 cursor-pointer group" onclick="setInkColor('blue')">
                     <div class="w-6 h-6 rounded-full bg-blue-700 border-2 border-blue-500 shadow-sm relative group-hover:scale-110 transition-transform">
                         <div class="absolute inset-0 rounded-full border-2 border-white opacity-0 transition-opacity" id="ring-blue"></div>
-                    </div>
-                    <span class="text-xs text-zinc-400 group-hover:text-white transition-colors">Azul</span>
+                    </div><span class="text-xs text-zinc-400 group-hover:text-white transition-colors">Azul</span>
                 </div>
             </div>
-
             <div class="flex-1 px-4 pb-0 bg-zinc-900 flex flex-col relative">
                 <div id="view-draw" class="flex-1 flex flex-col">
                     <div class="flex-1 border border-zinc-700 bg-[#18181b] rounded-xl relative overflow-hidden shadow-inner min-h-[180px]">
@@ -217,36 +196,25 @@
                         <span class="absolute bottom-3 right-3 text-[10px] text-zinc-600 pointer-events-none font-medium uppercase tracking-wider">Assine Acima</span>
                     </div>
                     <div class="flex justify-between mt-3 px-1">
-                        <button onclick="clearPad()" class="text-xs text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 py-2">
-                            <i data-lucide="eraser" class="w-3.5 h-3.5"></i> Limpar
-                        </button>
-                        <button onclick="useLastSignature()" id="btn-restore" class="hidden text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1.5 py-2">
-                            <i data-lucide="history" class="w-3.5 h-3.5"></i> Restaurar
-                        </button>
+                        <button onclick="clearPad()" class="text-xs text-zinc-500 hover:text-white transition-colors flex items-center gap-1.5 py-2"><i data-lucide="eraser" class="w-3.5 h-3.5"></i> Limpar</button>
+                        <button onclick="useLastSignature()" id="btn-restore" class="hidden text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1.5 py-2"><i data-lucide="history" class="w-3.5 h-3.5"></i> Restaurar</button>
                     </div>
                 </div>
-
                 <div id="view-type" class="hidden flex-1 flex flex-col items-center justify-center min-h-[180px] bg-zinc-950/50 rounded-xl border border-zinc-800">
-                    <input type="text" id="type-input" placeholder="Digite seu nome" 
-                        class="w-full bg-transparent text-center text-4xl text-white font-cursive focus:outline-none placeholder-zinc-700 px-4 py-2" 
-                        oninput="updateTypePreview()">
+                    <input type="text" id="type-input" placeholder="Digite seu nome" class="w-full bg-transparent text-center text-4xl text-white font-cursive focus:outline-none placeholder-zinc-700 px-4 py-2" oninput="updateTypePreview()">
                     <div class="w-1/2 h-px bg-zinc-800 mt-2"></div>
                     <p class="text-xs text-zinc-500 mt-4">Será gerado com estilo cursivo</p>
                 </div>
             </div>
-
             <div class="p-4 pt-4 bg-zinc-900 border-t border-zinc-800 mt-2">
-                <button onclick="addSignature()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 text-sm">
-                    <i data-lucide="check" class="w-4 h-4"></i> Confirmar Assinatura
-                </button>
+                <button onclick="addSignature()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white py-3.5 rounded-xl font-semibold shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 text-sm"><i data-lucide="check" class="w-4 h-4"></i> Confirmar Assinatura</button>
             </div>
         </div>
     </div>
 
-    <!-- SUCCESS MODAL -->
+    <!-- Success Modal -->
     <div id="success-modal" class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-md flex items-center justify-center animate-fade-in p-4">
         <div class="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-scale-in">
-            
             <div class="p-6 text-center">
                 <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/20">
                     <i data-lucide="check" class="w-8 h-8 text-green-400"></i>
@@ -254,16 +222,12 @@
                 <h2 class="text-2xl font-bold text-white mb-1">Documento Pronto!</h2>
                 <p class="text-zinc-400 text-sm">Seu PDF foi assinado e compilado com sucesso.</p>
             </div>
-
-            <!-- Preview Area -->
             <div class="px-6 pb-4 flex justify-center">
                 <div class="relative rounded-lg overflow-hidden border border-zinc-700 bg-zinc-800 max-h-[300px] shadow-lg">
                     <canvas id="preview-canvas" class="block w-full h-auto"></canvas>
                     <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/20 to-transparent"></div>
                 </div>
             </div>
-
-            <!-- Action Buttons -->
             <div class="p-6 pt-2 bg-zinc-900 grid gap-3">
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="previewFinalPdf()" class="py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-all flex items-center justify-center gap-2 border border-zinc-700">
@@ -273,15 +237,13 @@
                         <i data-lucide="share" class="w-4 h-4"></i> Baixar / Salvar
                     </button>
                 </div>
-                <button onclick="closeSuccessModal()" class="py-3 px-4 rounded-xl text-zinc-500 hover:text-zinc-300 text-sm font-medium transition-colors">
-                    Voltar e Editar
-                </button>
+                <button onclick="closeSuccessModal()" class="py-3 px-4 rounded-xl text-zinc-500 hover:text-zinc-300 text-sm font-medium transition-colors">Voltar e Editar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Init ---
+        // Init
         lucide.createIcons();
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -294,10 +256,7 @@
         let finalPdfBlobUrl = null; 
         let finalPdfData = null; 
 
-        const COLORS = {
-            black: { hex: '#000000', label: 'Preto' },
-            blue: { hex: '#0033cc', label: 'Azul' }
-        };
+        const COLORS = { black: { hex: '#000000' }, blue: { hex: '#0033cc' } };
 
         const canvas = document.getElementById('the-canvas');
         const ctx = canvas.getContext('2d');
@@ -305,35 +264,26 @@
         const pad = document.getElementById('pad');
         const padCtx = pad.getContext('2d');
 
+        // File Upload
         document.getElementById('file-upload').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 const buffer = ev.target.result;
                 pdfBytes = new Uint8Array(buffer.slice(0)); 
-
                 try {
                     const loadingTask = pdfjsLib.getDocument(new Uint8Array(buffer));
                     pdfDoc = await loadingTask.promise;
-                    
                     document.getElementById('empty-state').classList.add('hidden');
                     const wrapper = document.getElementById('pdf-wrapper');
                     wrapper.classList.remove('hidden');
                     setTimeout(() => wrapper.classList.remove('opacity-0'), 50);
                     document.getElementById('controls').classList.remove('hidden');
-                    
-                    ['btn-add-sig', 'btn-add-date', 'save-btn'].forEach(id => {
-                        document.getElementById(id).disabled = false;
-                    });
-
-                    pageNum = 1;
-                    items = [];
+                    ['btn-add-sig', 'btn-add-date', 'save-btn'].forEach(id => document.getElementById(id).disabled = false);
+                    pageNum = 1; items = [];
                     renderPage(pageNum);
-                } catch(err) {
-                    alert("Erro ao abrir PDF: " + err.message);
-                }
+                } catch(err) { alert("Erro ao abrir PDF: " + err.message); }
             };
             reader.readAsArrayBuffer(file);
         });
@@ -341,27 +291,17 @@
         async function renderPage(num) {
             if (!pdfDoc) return;
             const page = await pdfDoc.getPage(num);
-            
             const containerWidth = Math.min(window.innerWidth - 32, 1000);
             const unscaledViewport = page.getViewport({scale: 1});
             const cssScale = containerWidth / unscaledViewport.width;
-            
             const viewport = page.getViewport({scale: cssScale});
             const outputScale = window.devicePixelRatio || 1;
-
             canvas.width = Math.floor(viewport.width * outputScale);
             canvas.height = Math.floor(viewport.height * outputScale);
             canvas.style.width = Math.floor(viewport.width) + "px";
             canvas.style.height = Math.floor(viewport.height) + "px";
-
             const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-            await page.render({
-                canvasContext: ctx,
-                transform: transform,
-                viewport: viewport
-            }).promise;
-            
+            await page.render({ canvasContext: ctx, transform: transform, viewport: viewport }).promise;
             document.getElementById('page-num').innerText = `${num} / ${pdfDoc.numPages}`;
             renderItems();
         }
@@ -369,24 +309,16 @@
         function changePage(delta) {
             if (!pdfDoc) return;
             const newPage = pageNum + delta;
-            if (newPage >= 1 && newPage <= pdfDoc.numPages) {
-                pageNum = newPage;
-                renderPage(pageNum);
-            }
+            if (newPage >= 1 && newPage <= pdfDoc.numPages) { pageNum = newPage; renderPage(pageNum); }
         }
 
+        // Modal Functions
         function openModal() {
             document.getElementById('modal').classList.remove('hidden');
-            resizePad();
-            setTab('draw'); 
-            setInkColor(inkColor);
-            if(localStorage.getItem('signflow_last')) {
-                document.getElementById('btn-restore').classList.remove('hidden');
-            }
+            resizePad(); setTab('draw'); setInkColor(inkColor);
+            if(localStorage.getItem('signflow_last')) document.getElementById('btn-restore').classList.remove('hidden');
         }
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
         function setTab(mode) {
             activeMode = mode;
@@ -394,19 +326,14 @@
             const tabType = document.getElementById('tab-type');
             const viewDraw = document.getElementById('view-draw');
             const viewType = document.getElementById('view-type');
-
             if (mode === 'draw') {
                 tabDraw.className = "flex-1 py-2 rounded-lg text-sm font-medium transition-all bg-zinc-800 text-white shadow-sm";
                 tabType.className = "flex-1 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-all";
-                viewDraw.classList.remove('hidden');
-                viewType.classList.add('hidden');
-                setTimeout(resizePad, 10);
+                viewDraw.classList.remove('hidden'); viewType.classList.add('hidden'); setTimeout(resizePad, 10);
             } else {
                 tabType.className = "flex-1 py-2 rounded-lg text-sm font-medium transition-all bg-zinc-800 text-white shadow-sm";
                 tabDraw.className = "flex-1 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-all";
-                viewType.classList.remove('hidden');
-                viewDraw.classList.add('hidden');
-                document.getElementById('type-input').focus();
+                viewType.classList.remove('hidden'); viewDraw.classList.add('hidden'); document.getElementById('type-input').focus();
             }
             updateTypePreview();
         }
@@ -419,139 +346,67 @@
         }
 
         function updateTypePreview() {
-            const input = document.getElementById('type-input');
-            input.style.color = (inkColor === 'blue') ? '#60a5fa' : '#ffffff'; 
+            document.getElementById('type-input').style.color = (inkColor === 'blue') ? '#60a5fa' : '#ffffff';
         }
 
-        let points = [];
-        let isDrawing = false;
-
+        // Drawing Logic
+        let points = []; let isDrawing = false;
         function resizePad() {
             const rect = pad.parentElement.getBoundingClientRect();
-            pad.width = rect.width;
-            pad.height = rect.height;
-            padCtx.lineJoin = 'round';
-            padCtx.lineCap = 'round';
-            padCtx.lineWidth = 3;
-            padCtx.strokeStyle = '#fff';
+            pad.width = rect.width; pad.height = rect.height;
+            padCtx.lineJoin = 'round'; padCtx.lineCap = 'round'; padCtx.lineWidth = 3; padCtx.strokeStyle = '#fff';
         }
-
-        function clearPad() {
-            padCtx.clearRect(0, 0, pad.width, pad.height);
-            points = [];
-            document.getElementById('type-input').value = '';
-        }
-
+        function clearPad() { padCtx.clearRect(0, 0, pad.width, pad.height); points = []; document.getElementById('type-input').value = ''; }
         function getPos(e) {
             const rect = pad.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
+            const cx = e.touches ? e.touches[0].clientX : e.clientX;
+            const cy = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: cx - rect.left, y: cy - rect.top };
         }
-
-        ['mousedown', 'touchstart'].forEach(ev => pad.addEventListener(ev, (e) => {
-            isDrawing = true;
-            points.push(getPos(e));
-            e.preventDefault();
-        }, {passive: false}));
-
+        ['mousedown', 'touchstart'].forEach(ev => pad.addEventListener(ev, (e) => { isDrawing = true; points.push(getPos(e)); e.preventDefault(); }, {passive: false}));
         ['mousemove', 'touchmove'].forEach(ev => pad.addEventListener(ev, (e) => {
-            if (!isDrawing) return;
-            const pos = getPos(e);
-            points.push(pos);
+            if (!isDrawing) return; const pos = getPos(e); points.push(pos);
             if (points.length > 2) {
-                const p1 = points[points.length - 3];
-                const p2 = points[points.length - 2];
-                const p3 = points[points.length - 1];
-                const mid1 = { x: (p1.x + p2.x)/2, y: (p1.y + p2.y)/2 };
-                const mid2 = { x: (p2.x + p3.x)/2, y: (p2.y + p3.y)/2 };
-
-                padCtx.beginPath();
-                padCtx.moveTo(mid1.x, mid1.y);
-                padCtx.quadraticCurveTo(p2.x, p2.y, mid2.x, mid2.y);
-                padCtx.stroke();
+                const p1 = points[points.length - 3], p2 = points[points.length - 2], p3 = points[points.length - 1];
+                const mid1 = { x: (p1.x + p2.x)/2, y: (p1.y + p2.y)/2 }, mid2 = { x: (p2.x + p3.x)/2, y: (p2.y + p3.y)/2 };
+                padCtx.beginPath(); padCtx.moveTo(mid1.x, mid1.y); padCtx.quadraticCurveTo(p2.x, p2.y, mid2.x, mid2.y); padCtx.stroke();
             }
             e.preventDefault();
         }, {passive: false}));
-
-        ['mouseup', 'touchend'].forEach(ev => pad.addEventListener(ev, () => {
-            isDrawing = false;
-            points = [];
-        }));
+        ['mouseup', 'touchend'].forEach(ev => pad.addEventListener(ev, () => { isDrawing = false; points = []; }));
 
         function addSignature() {
             let dataUrl;
-
             if (activeMode === 'draw') {
-                const tCanvas = document.createElement('canvas');
-                tCanvas.width = pad.width;
-                tCanvas.height = pad.height;
-                const tCtx = tCanvas.getContext('2d');
-                
-                tCtx.drawImage(pad, 0, 0);
-                tCtx.globalCompositeOperation = 'source-in';
-                tCtx.fillStyle = COLORS[inkColor].hex;
-                tCtx.fillRect(0, 0, tCanvas.width, tCanvas.height);
-                dataUrl = tCanvas.toDataURL();
-                
-                localStorage.setItem('signflow_last', dataUrl);
-
+                const tCanvas = document.createElement('canvas'); tCanvas.width = pad.width; tCanvas.height = pad.height;
+                const tCtx = tCanvas.getContext('2d'); tCtx.drawImage(pad, 0, 0);
+                tCtx.globalCompositeOperation = 'source-in'; tCtx.fillStyle = COLORS[inkColor].hex; tCtx.fillRect(0, 0, tCanvas.width, tCanvas.height);
+                dataUrl = tCanvas.toDataURL(); localStorage.setItem('signflow_last', dataUrl);
             } else {
-                const text = document.getElementById('type-input').value.trim();
-                if (!text) return alert("Digite seu nome.");
-
-                const tCanvas = document.createElement('canvas');
-                tCanvas.width = 1000;
-                tCanvas.height = 300;
-                const tCtx = tCanvas.getContext('2d');
-
-                tCtx.font = "italic 120px 'Great Vibes'";
-                tCtx.fillStyle = COLORS[inkColor].hex;
-                tCtx.textAlign = "center";
-                tCtx.textBaseline = "middle";
-                tCtx.fillText(text, 500, 150);
-                
+                const text = document.getElementById('type-input').value.trim(); if (!text) return alert("Digite seu nome.");
+                const tCanvas = document.createElement('canvas'); tCanvas.width = 1000; tCanvas.height = 300;
+                const tCtx = tCanvas.getContext('2d'); tCtx.font = "italic 120px 'Great Vibes'";
+                tCtx.fillStyle = COLORS[inkColor].hex; tCtx.textAlign = "center"; tCtx.textBaseline = "middle"; tCtx.fillText(text, 500, 150);
                 dataUrl = tCanvas.toDataURL();
             }
-
-            placeItem({ type: 'img', data: dataUrl, w: 150 });
-            closeModal();
-            clearPad();
+            placeItem({ type: 'img', data: dataUrl, w: 150 }); closeModal(); clearPad();
         }
 
         function useLastSignature() {
             const saved = localStorage.getItem('signflow_last');
-            if(saved) {
-                placeItem({ type: 'img', data: saved, w: 150 });
-                closeModal();
-            }
+            if(saved) { placeItem({ type: 'img', data: saved, w: 150 }); closeModal(); }
         }
 
         function addDateStamp() {
             const d = new Date().toLocaleDateString('pt-BR');
-            const tCanvas = document.createElement('canvas');
-            tCanvas.width = 400;
-            tCanvas.height = 100;
-            const tCtx = tCanvas.getContext('2d');
-            
-            tCtx.font = "500 60px 'Inter'"; 
-            tCtx.fillStyle = "#000000";
-            tCtx.textAlign = "center";
-            tCtx.textBaseline = "middle";
-            tCtx.fillText(d, 200, 50);
-
+            const tCanvas = document.createElement('canvas'); tCanvas.width = 400; tCanvas.height = 100;
+            const tCtx = tCanvas.getContext('2d'); tCtx.font = "500 60px 'Inter'"; tCtx.fillStyle = "#000000";
+            tCtx.textAlign = "center"; tCtx.textBaseline = "middle"; tCtx.fillText(d, 200, 50);
             placeItem({ type: 'img', data: tCanvas.toDataURL(), w: 120 });
         }
 
         function placeItem(obj) {
-            items.push({
-                id: Date.now(),
-                type: 'img',
-                page: pageNum,
-                x: 40, y: 45,
-                w: obj.w,
-                data: obj.data
-            });
+            items.push({ id: Date.now(), type: 'img', page: pageNum, x: 40, y: 45, w: obj.w, data: obj.data });
             renderItems();
         }
 
@@ -559,183 +414,101 @@
             layer.innerHTML = '';
             items.forEach(item => {
                 if(item.page !== pageNum) return;
-
-                const el = document.createElement('div');
-                el.className = 'drag-item group';
-                el.style.left = item.x + '%';
-                el.style.top = item.y + '%';
-                el.style.width = item.w + 'px';
-
-                el.innerHTML = `<img src="${item.data}">`;
-
-                el.innerHTML += `
-                    <div class="control-btn delete-btn" id="del-${item.id}"><i data-lucide="x" class="w-4 h-4"></i></div>
-                    <div class="control-btn resize-handle" id="res-${item.id}"></div>
-                `;
-
-                el.querySelector(`#del-${item.id}`).addEventListener('pointerdown', (e) => {
-                    e.stopPropagation();
-                    items = items.filter(i => i.id !== item.id);
-                    renderItems();
-                });
-
-                layer.appendChild(el);
-                initDrag(el, item);
+                const el = document.createElement('div'); el.className = 'drag-item group';
+                el.style.left = item.x + '%'; el.style.top = item.y + '%'; el.style.width = item.w + 'px';
+                el.innerHTML = `<img src="${item.data}"><div class="control-btn delete-btn" id="del-${item.id}"><i data-lucide="x" class="w-4 h-4"></i></div><div class="control-btn resize-handle" id="res-${item.id}"></div>`;
+                el.querySelector(`#del-${item.id}`).addEventListener('pointerdown', (e) => { e.stopPropagation(); items = items.filter(i => i.id !== item.id); renderItems(); });
+                layer.appendChild(el); initDrag(el, item);
             });
             lucide.createIcons();
         }
 
         function initDrag(el, item) {
-            let state = null;
-            let start = {x:0, y:0};
-            let initial = {l:0, t:0, w:0};
-            const p = layer.getBoundingClientRect();
-
+            let state = null, start = {x:0, y:0}, initial = {l:0, t:0, w:0}; const p = layer.getBoundingClientRect();
             const onDown = (e) => {
-                if(e.target.classList.contains('resize-handle')) state = 'resize';
-                else if(e.target.closest('.delete-btn')) return;
-                else state = 'drag';
-                
+                if(e.target.classList.contains('resize-handle')) state = 'resize'; else if(e.target.closest('.delete-btn')) return; else state = 'drag';
                 el.classList.add('is-active', state === 'drag' ? 'is-dragging' : 'no-op');
-                el.setPointerCapture(e.pointerId);
-                start = {x: e.clientX, y: e.clientY};
-                initial = {l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth};
-                e.preventDefault();
+                el.setPointerCapture(e.pointerId); start = {x: e.clientX, y: e.clientY}; initial = {l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth}; e.preventDefault();
             };
-
             const onMove = (e) => {
-                if(!state) return;
-                const dx = e.clientX - start.x;
-                const dy = e.clientY - start.y;
-
+                if(!state) return; const dx = e.clientX - start.x, dy = e.clientY - start.y;
                 if(state === 'drag') {
-                    let nl = initial.l + dx;
-                    let nt = initial.t + dy;
-                    nl = Math.max(0, Math.min(nl, p.width - el.offsetWidth));
-                    nt = Math.max(0, Math.min(nt, p.height - el.offsetHeight));
-                    el.style.left = nl + 'px';
-                    el.style.top = nt + 'px';
+                    let nl = initial.l + dx, nt = initial.t + dy;
+                    nl = Math.max(0, Math.min(nl, p.width - el.offsetWidth)); nt = Math.max(0, Math.min(nt, p.height - el.offsetHeight));
+                    el.style.left = nl + 'px'; el.style.top = nt + 'px';
                 } else {
-                    let nw = Math.max(40, Math.min(initial.w + dx, p.width - initial.l));
-                    el.style.width = nw + 'px';
+                    let nw = Math.max(40, Math.min(initial.w + dx, p.width - initial.l)); el.style.width = nw + 'px';
                 }
             };
-
             const onUp = (e) => {
-                if(!state) return;
-                el.classList.remove('is-active', 'is-dragging');
-                el.releasePointerCapture(e.pointerId);
-                
-                if(state === 'drag') {
-                    item.x = (el.offsetLeft / p.width) * 100;
-                    item.y = (el.offsetTop / p.height) * 100;
-                } else {
-                    item.w = el.offsetWidth;
-                }
+                if(!state) return; el.classList.remove('is-active', 'is-dragging'); el.releasePointerCapture(e.pointerId);
+                if(state === 'drag') { item.x = (el.offsetLeft / p.width) * 100; item.y = (el.offsetTop / p.height) * 100; } else { item.w = el.offsetWidth; }
                 state = null;
             };
-
-            el.addEventListener('pointerdown', onDown);
-            el.addEventListener('pointermove', onMove);
-            el.addEventListener('pointerup', onUp);
+            el.addEventListener('pointerdown', onDown); el.addEventListener('pointermove', onMove); el.addEventListener('pointerup', onUp);
         }
 
         async function processPdf() {
             if (items.length === 0) return alert("Documento sem alterações.");
-            
-            if(!pdfBytes || pdfBytes.length === 0) {
-                 return alert("Erro Interno: O arquivo PDF original foi perdido. Recarregue.");
-            }
-
-            const btn = document.getElementById('save-btn');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<div class="loader"></div>';
-
+            if(!pdfBytes || pdfBytes.length === 0) return alert("Erro Interno. Recarregue a página.");
+            const btn = document.getElementById('save-btn'); const originalHTML = btn.innerHTML; btn.innerHTML = '<div class="loader"></div>';
             try {
                 const pdfDocLib = await PDFLib.PDFDocument.load(pdfBytes);
                 const pages = pdfDocLib.getPages();
-
                 for(const item of items) {
-                    const page = pages[item.page - 1];
-                    const { width, height } = page.getSize();
+                    const page = pages[item.page - 1]; const { width, height } = page.getSize();
                     const scaleFactor = width / canvas.getBoundingClientRect().width;
-                    
-                    const pdfW = item.w * scaleFactor;
-                    const pdfX = (item.x / 100) * width;
-                    
+                    const pdfW = item.w * scaleFactor; const pdfX = (item.x / 100) * width;
                     const img = await pdfDocLib.embedPng(item.data);
-                    const pdfH = (img.height/img.width) * pdfW;
-                    const pdfY = height - ((item.y/100)*height) - pdfH;
+                    const pdfH = (img.height/img.width) * pdfW; const pdfY = height - ((item.y/100)*height) - pdfH;
                     page.drawImage(img, { x: pdfX, y: pdfY, width: pdfW, height: pdfH });
                 }
-
                 finalPdfData = await pdfDocLib.save();
-                
                 const blob = new Blob([finalPdfData], { type: 'application/pdf' });
                 if(finalPdfBlobUrl) URL.revokeObjectURL(finalPdfBlobUrl);
                 finalPdfBlobUrl = URL.createObjectURL(blob);
-
                 await renderPreview(finalPdfData);
-
                 document.getElementById('success-modal').classList.remove('hidden');
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#ffffff'] });
-
-            } catch(e) {
-                alert("Erro ao processar: " + e.message);
-                console.error(e);
-            } finally {
-                btn.innerHTML = originalHTML;
-            }
+            } catch(e) { alert("Erro ao processar: " + e.message); console.error(e); } finally { btn.innerHTML = originalHTML; }
         }
 
         async function renderPreview(data) {
-            const loadingTask = pdfjsLib.getDocument(data);
-            const doc = await loadingTask.promise;
-            const page = await doc.getPage(1);
-            
-            const prevCanvas = document.getElementById('preview-canvas');
-            const viewport = page.getViewport({ scale: 1 });
-            
-            const scale = 300 / viewport.height;
-            const scaledViewport = page.getViewport({ scale: scale });
-            
-            const dpr = window.devicePixelRatio || 1;
-            prevCanvas.width = Math.floor(scaledViewport.width * dpr);
-            prevCanvas.height = Math.floor(scaledViewport.height * dpr);
-            
-            const renderCtx = prevCanvas.getContext('2d');
-            renderCtx.scale(dpr, dpr);
-            
-            await page.render({
-                canvasContext: renderCtx,
-                viewport: scaledViewport
-            }).promise;
+            const loadingTask = pdfjsLib.getDocument(data); const doc = await loadingTask.promise; const page = await doc.getPage(1);
+            const prevCanvas = document.getElementById('preview-canvas'); const viewport = page.getViewport({ scale: 1 });
+            const scale = 300 / viewport.height; const scaledViewport = page.getViewport({ scale: scale });
+            const dpr = window.devicePixelRatio || 1; prevCanvas.width = Math.floor(scaledViewport.width * dpr); prevCanvas.height = Math.floor(scaledViewport.height * dpr);
+            const renderCtx = prevCanvas.getContext('2d'); renderCtx.scale(dpr, dpr);
+            await page.render({ canvasContext: renderCtx, viewport: scaledViewport }).promise;
         }
 
-        function previewFinalPdf() {
-            if(finalPdfBlobUrl) window.open(finalPdfBlobUrl, '_blank');
-        }
+        function previewFinalPdf() { if(finalPdfBlobUrl) window.open(finalPdfBlobUrl, '_blank'); }
 
         async function downloadFinalPdf() {
             if (!finalPdfData) return;
-            
-            const blob = new Blob([finalPdfData], { type: 'application/pdf' });
             const fileName = `Documento_Assinado_${Date.now()}.pdf`;
-            const file = new File([blob], fileName, { type: 'application/pdf' });
-
-            // iOS Safari Share API Logic
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file]
-                    });
-                    return; 
-                } catch (error) {
-                    console.log('Share canceled/failed', error);
+            
+            // 1. Try Native Sharing (Best for iOS)
+            if (navigator.share && navigator.canShare) {
+                // IMPORTANT: 'lastModified' is crucial for iOS to accept the File as valid
+                const file = new File([finalPdfData], fileName, { 
+                    type: "application/pdf", 
+                    lastModified: new Date().getTime() 
+                });
+                
+                if (navigator.canShare({ files: [file] })) {
+                    try {
+                        // DO NOT send 'text' or 'title' to avoid creating a second .txt file on some iOS versions
+                        await navigator.share({ files: [file] });
+                        return;
+                    } catch (err) {
+                        console.log("Share failed/cancelled, falling back.");
+                    }
                 }
             }
 
-            // Fallback
+            // 2. Fallback: Classic Download Anchor
+            const blob = new Blob([finalPdfData], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -746,9 +519,7 @@
             URL.revokeObjectURL(url);
         }
 
-        function closeSuccessModal() {
-            document.getElementById('success-modal').classList.add('hidden');
-        }
+        function closeSuccessModal() { document.getElementById('success-modal').classList.add('hidden'); }
     </script>
 </body>
 </html>

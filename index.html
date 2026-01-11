@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SignFlow Ultimate (Final)</title>
+    <title>SignFlow Ultimate (Stable)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
     <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://unpkg.com/downloadjs@1.4.7/download.min.js"></script>
+    <!-- Removed downloadjs dependency as we are using native download -->
 
     <script>
         tailwind.config = {
@@ -244,7 +244,7 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL (NEW) -->
+    <!-- SUCCESS MODAL -->
     <div id="success-modal" class="fixed inset-0 z-[110] hidden bg-black/80 backdrop-blur-md flex items-center justify-center animate-fade-in p-4">
         <div class="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-scale-in">
             
@@ -292,8 +292,8 @@
         let items = [];
         let inkColor = 'black'; 
         let activeMode = 'draw'; 
-        let finalPdfBlobUrl = null; // Store final PDF URL
-        let finalPdfData = null; // Store final PDF bytes
+        let finalPdfBlobUrl = null; 
+        let finalPdfData = null; 
 
         const COLORS = {
             black: { hex: '#000000', label: 'Preto' },
@@ -641,7 +641,6 @@
             el.addEventListener('pointerup', onUp);
         }
 
-        // --- NEW: Process and Show Success Modal ---
         async function processPdf() {
             if (items.length === 0) return alert("Documento sem alterações.");
             
@@ -654,7 +653,6 @@
             btn.innerHTML = '<div class="loader"></div>';
 
             try {
-                // 1. Compile PDF in memory
                 const pdfDocLib = await PDFLib.PDFDocument.load(pdfBytes);
                 const pages = pdfDocLib.getPages();
 
@@ -674,15 +672,12 @@
 
                 finalPdfData = await pdfDocLib.save();
                 
-                // 2. Create Blob URL for preview/download
                 const blob = new Blob([finalPdfData], { type: 'application/pdf' });
-                if(finalPdfBlobUrl) URL.revokeObjectURL(finalPdfBlobUrl); // Cleanup prev
+                if(finalPdfBlobUrl) URL.revokeObjectURL(finalPdfBlobUrl);
                 finalPdfBlobUrl = URL.createObjectURL(blob);
 
-                // 3. Render Preview of Page 1 in Modal
                 await renderPreview(finalPdfData);
 
-                // 4. Show Modal
                 document.getElementById('success-modal').classList.remove('hidden');
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#6366f1', '#ffffff'] });
 
@@ -695,7 +690,6 @@
         }
 
         async function renderPreview(data) {
-            // Render first page of resulting PDF to canvas in modal
             const loadingTask = pdfjsLib.getDocument(data);
             const doc = await loadingTask.promise;
             const page = await doc.getPage(1);
@@ -703,11 +697,9 @@
             const prevCanvas = document.getElementById('preview-canvas');
             const viewport = page.getViewport({ scale: 1 });
             
-            // Limit preview height to ~300px visually
             const scale = 300 / viewport.height;
             const scaledViewport = page.getViewport({ scale: scale });
             
-            // High DPI for crisp preview
             const dpr = window.devicePixelRatio || 1;
             prevCanvas.width = Math.floor(scaledViewport.width * dpr);
             prevCanvas.height = Math.floor(scaledViewport.height * dpr);
@@ -726,8 +718,23 @@
         }
 
         function downloadFinalPdf() {
-            if(finalPdfData) {
-                download(finalPdfData, `Documento_Assinado_${Date.now()}.pdf`, "application/pdf");
+            if (finalPdfBlobUrl) {
+                const link = document.createElement('a');
+                link.href = finalPdfBlobUrl;
+                link.download = `Documento_Assinado_${Date.now()}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else if (finalPdfData) {
+                const blob = new Blob([finalPdfData], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Documento_Assinado_${Date.now()}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
             }
         }
 
